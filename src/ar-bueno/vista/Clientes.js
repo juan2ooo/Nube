@@ -1,6 +1,7 @@
-$(document).ready(function() {
-    // Array de datos de ejemplo (puedes modificarlo según tus necesidades)
-/*     var datos = [
+var table;
+$(document).ready(function () {
+  // Array de datos de ejemplo (puedes modificarlo según tus necesidades)
+  /*     var datos = [
         {
 
             nombre: "Juan Pérez",
@@ -25,46 +26,50 @@ $(document).ready(function() {
         }
     ]; */
 
-    var datos = []
+  const datos = [];
 
-    // Inicializar DataTable
-    var table = $('#resultsTable').DataTable({
-        data: datos,
-        columns: [
-            { data: 'nombre', title: 'Nombre' },
-            { data: 'telefono', title: 'Teléfono' },
-            { data: 'horario', title: 'Teléfono' },
-            { data: 'observacion', title: 'Observación' },
+  // Inicializar DataTable
+  table = $("#resultsTable").DataTable({
+    data: datos,
+    columns: [
+      { data: "nombre", title: "Nombre" },
+      { data: "telefono", title: "Teléfono" },
+      { data: "horario", title: "Teléfono" },
+      { data: "observacion", title: "Observación" },
 
-            {
-                data: null,
-                title: 'Acciones',
-                render: function(data, type, row) {
-                    return '<button class="btn-editar" data-id="' + row.id + '">Editar</button>' +
-                           '<button class="btn-eliminar" data-id="' + row.id + '">Eliminar</button>';
-                }
-            }
-        ],
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json' // Español
-        }
-    });
+      {
+        data: null,
+        title: "Acciones",
+        render: function (data, type, row) {
+          return (
+            '<button class="btn-editar" data-id="' +
+            row.id +
+            '">Editar</button>' +
+            '<input type="checkbox" id="subscribeNews" name="subscribe" value="newsletter" />' 
+          );
+        },
+      },
+    ],
+    language: {
+      url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json", // Español
+    },
+  });
 
-    // Ejemplo de eventos para los botones (puedes personalizar)
-    $('#resultsTable').on('click', '.btn-editar', function() {
-        var id = $(this).data('id');
-        alert('Editar ID: ' + id);
-        // Aquí puedes agregar tu lógica para editar
-    });
+  // Ejemplo de eventos para los botones (puedes personalizar)
+  $("#resultsTable").on("click", ".btn-editar", function () {
+    var id = $(this).data("id");
+    alert("Editar ID: " + id);
+    // Aquí puedes agregar tu lógica para editar
+  });
 
-    $('#resultsTable').on('click', '.btn-eliminar', function() {
-        var id = $(this).data('id');
-        if(confirm('¿Estás seguro de eliminar el registro con ID: ' + id + '?')) {
-            // Aquí puedes agregar tu lógica para eliminar
-            table.row($(this).parents('tr')).remove().draw();
-            alert('Registro eliminado');
-        }
-    });
+  $("#resultsTable").on("click", ".btn-eliminar", function () {
+    var id = $(this).data("id");
+    if (confirm("¿Estás seguro de eliminar el registro con ID: " + id + "?")) {
+      // Aquí puedes agregar tu lógica para eliminar
+      table.row($(this).parents("tr")).remove().draw();
+      alert("Registro eliminado");
+    }
+  });
 });
 
 /* // Cerrar modal al hacer clic fuera del contenido
@@ -75,73 +80,58 @@ window.addEventListener("click", function (event) {
   }
 }); */
 
-
-
 let mouseDownInsideModal = false;
 
 // Detecta si el clic INICIÓ dentro del modal-content
-$(document).on('mousedown', '#myModal .modal-content', function() {
-    mouseDownInsideModal = true;
+$(document).on("mousedown", "#myModal .modal-content", function () {
+  mouseDownInsideModal = true;
 });
 
 // Cierra solo si:
 // 1. El clic NO comenzó dentro del modal Y
 // 2. Se hace clic en el fondo del modal (#myModal)
-$(document).on('mouseup', '#myModal', function(e) {
-    if (!mouseDownInsideModal && e.target === this) {
-        $(this).hide();
-    }
-    mouseDownInsideModal = false; // Resetear
+$(document).on("mouseup", "#myModal", function (e) {
+  if (!mouseDownInsideModal && e.target === this) {
+    $(this).hide();
+  }
+  mouseDownInsideModal = false; // Resetear
 });
 
-
-
-
-
-
-
-
-$(document).on('click', '#cerrar', function() {
-    $('#myModal').hide();
+$(document).on("click", "#cerrar", function () {
+  $("#myModal").hide();
 });
 
+$(document).on("click", "#searchButton", function () {
+  const datosEnviar = { accion: "buscarClientes" };
+  datosEnviar["telefono"] = $("#searchTerm1").val();
+  datosEnviar["nombre"] = $("#searchTerm").val();
 
+  if (datosEnviar["nombre"] === "" && datosEnviar["telefono"] === "") return;
 
+  $.ajax({
+    url: "../controlador/ControllerAdmin.php",
+    type: "POST",
+    dataType: "json", // <-- muy importante
+    data: datosEnviar,
+    success: function (response) {
+      if (response["message"] === "N") {
+        abrirErrorSweet("No se encontro resultado");
+      }
 
+      console.log("respuesta desde el server:", response["data"]);
 
-$(document).on('click', '#searchButton', function() {
-    const nombre = $('#searchTerm').val();
-    const telefono = $('#searchTerm1').val();
+      table.clear().draw();
 
-
-    const datosEnviar = {accion: "buscarClientes"}
-
-    if(nombre !== "") datosEnviar["nombre"] = nombre
-    if(telefono !== "") datosEnviar["telefono"] = telefono
-
-
-
-    console.log(datosEnviar);
-    if(datosEnviar["nombre"] === "" && datosEnviar["telefono"] === "") return
-
-
-    $.ajax({
-      url: "../controlador/ControllerAdmin.php",
-      type: "POST",
-      data: datosEnviar,
-      success: function (response) {
-        alert(response)
-      },
-      error: function (xhr, status, error) {
-        alert(error);
-      },
-    });
+      response["data"].forEach((element,i) => {
+        const row = table.row.add(element).draw().node();
+        $(row).attr("id", "row-" + i);
+      });
+    },
+    error: function (xhr, status, error) {
+      alert(error);
+    },
+  });
 });
-
-
-
-
-
 
 function abrirModal() {
   $(myModal).css("display", "block"); // Esto está mal, 'auto' no es valor válido para display
@@ -175,36 +165,21 @@ $(document).ready(function () {
       observacion: $("#obsCliente").val(),
     };
 
-
-
-
     $.ajax({
       url: "../controlador/ControllerAdmin.php",
       type: "POST",
       data: datosEnviar,
       success: function (response) {
-
-
-        if(response["success"]==true){
-            todoOKSweet("Cliente creado")
-            vaciarClienteModal();
-
-        }else{
-            console.log("??")
-            if(response["message"].toLowerCase().startsWith('duplicate entry')){
-                abrirErrorSweet("Numero ya existe, ingrese otro");
-            }else abrirErrorSweet("Error desconocido, contacte al administrador")
+        if (response["success"] == true) {
+          todoOKSweet("Cliente creado");
+          vaciarClienteModal();
+        } else {
+          console.log("??");
+          if (response["message"].toLowerCase().startsWith("duplicate entry")) {
+            abrirErrorSweet("Numero ya existe, ingrese otro");
+          } else
+            abrirErrorSweet("Error desconocido, contacte al administrador");
         }
-
-        
-
-        
-
-
-
-        
-
-        
       },
       error: function (xhr, status, error) {
         alert(error);
@@ -213,34 +188,23 @@ $(document).ready(function () {
   });
 });
 
-
-
-
-function abrirErrorSweet(mensaje){
-    Swal.fire({
-        icon: "error",
-        title: mensaje,
-    });
+function abrirErrorSweet(mensaje) {
+  Swal.fire({
+    icon: "error",
+    title: mensaje,
+  });
 }
 
-
-
-function todoOKSweet(mensaje){
-    Swal.fire({
-        title: mensaje,
-        icon: "success",
-        draggable: true
-    });
+function todoOKSweet(mensaje) {
+  Swal.fire({
+    title: mensaje,
+    icon: "success",
+    draggable: true,
+  });
 }
-
-
-
 
 function vaciarClienteModal() {
-    $("#nombreCliente").val("");
-    $("#telCliente").val("");
-    $("#obsCliente").val("");
+  $("#nombreCliente").val("");
+  $("#telCliente").val("");
+  $("#obsCliente").val("");
 }
-
-
-

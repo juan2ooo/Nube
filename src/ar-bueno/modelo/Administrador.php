@@ -13,15 +13,29 @@ require_once "BD.php";
             );
 
         $bd = new BD();
-        return $bd->insert("cliente", $datosCliente); 
+            return $bd->insert("cliente", $datosCliente); 
         }
 
 
         public function buscarCliente($datos){
             $nombreTabla = "cliente";
             $nombresClaves = $datos["nombreClaves"];
+
             $claves = $datos["claves"];
             $bd = new BD();
-            return $bd->selectByTwoKey($nombreTabla, $nombresClaves,$claves); 
+
+            if (is_array($datos["claves"])){
+                error_log("por el si");
+                
+                if (count($datos["claves"]) == 0){
+                    error_log("por el si x 2");
+                    error_log("por aqui!!!!");
+                    return;
+                }
+                return $bd->selectByTwoKey($nombreTabla, $nombresClaves,$claves);
+            }
+
+            error_log("por el no");
+            return $bd->selectByKeyLike($nombreTabla, $nombresClaves,$claves);
         }
     }

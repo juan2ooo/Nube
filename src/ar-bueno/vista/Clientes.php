@@ -51,6 +51,9 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Actualizar tiempo de actividad
                 <button id="aggBtn" class="btn-blue" onclick="abrirModal()">
                     <i class="fas fa-user-plus"></i>Agregar
                 </button>
+                <button class="btn-blue" onclick="eliminarElemento()">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
 
             </div>
         </div>

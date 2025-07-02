@@ -103,6 +103,50 @@ class BD
 
 
 
+public function selectByKeyLike($nombreTabla, $nombreColumnaClave, $clave)
+{
+    error_log($nombreTabla);
+    error_log($nombreColumnaClave);
+    error_log($clave);
+
+    // Leer contraseña desde archivo externo (igual que en insert)
+    $file = '../auth/cr/entrar.txt';
+    self::$db_pass = file_get_contents($file);
+    
+    $this->db_open();
+    $result = false;
+
+    try {
+        // 1. Preparar la consulta SQL con parámetro
+        $sql = "SELECT * FROM $nombreTabla WHERE $nombreColumnaClave LIKE ?";
+        
+        // 2. Crear y ejecutar el prepared statement
+        $stmt = $this->conn->prepare($sql);
+        $likeClave = "%{$clave}%"; // <-- mover esto a una variable
+        $stmt->bind_param('s', $likeClave); // <-- pasar variable ya procesada
+        $stmt->execute();
+        
+        // 3. Obtener resultados
+        $queryResult = $stmt->get_result();
+        
+        // 4. Convertir resultados a array asociativo
+        if ($queryResult) {
+            $result = $queryResult->fetch_all(MYSQLI_ASSOC);
+        }
+        
+        $stmt->close();
+    } catch (Exception $e) {
+        error_log("Error en selectByKeyLike: " . $e->getMessage());
+        $result = false;
+    }
+    
+    $this->db_close();
+    return $result;
+}
+
+
+
+
 
         public function selectByTwoKey($nombreTabla, $nombreColumnaClave, $clave)
     {
@@ -115,12 +159,16 @@ class BD
 
         try {
             // 1. Preparar la consulta SQL con parámetro
-            $sql = "SELECT * FROM $nombreTabla WHERE $nombreColumnaClave[0] = ? AND $nombreColumnaClave[1] = ?";
+            $sql = "SELECT * FROM $nombreTabla WHERE $nombreColumnaClave[0] LIKE ? AND $nombreColumnaClave[1] LIKE ?";
+
             
             // 2. Crear y ejecutar el prepared statement
             $stmt = $this->conn->prepare($sql);
-            $stmt->bind_param('s', $clave[0]);
-            $stmt->bind_param('s', $clave[1]);
+            $clave[0] = "%{$clave[0]}%";    // nombre
+            $clave[1] = "{$clave[1]}%";     // teléfono
+
+            
+            $stmt->bind_param('ss', $clave[0], $clave[1]);
             $stmt->execute();
             
             // 3. Obtener resultados
@@ -129,6 +177,7 @@ class BD
             // 4. Convertir resultados a array asociativo
             if ($queryResult) {
                 $result = $queryResult->fetch_all(MYSQLI_ASSOC);
+                //error_log($result);
             }
             
             $stmt->close();
