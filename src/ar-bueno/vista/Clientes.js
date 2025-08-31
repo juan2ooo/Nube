@@ -34,13 +34,15 @@ $(document).ready(function () {
     columns: [
       { data: "nombre", title: "Nombre" },
       { data: "telefono", title: "Teléfono" },
-      { data: "horario", title: "Teléfono" },
+      { data: "horario", title: "horario" },
       { data: "observacion", title: "Observación" },
 
       {
         data: null,
         title: "Acciones",
+        
       render: function(data, type, row) {
+        
           return (
             '<div class="acciones-container">' +
               '<button class="btn-editar" data-id="' + row.id + '">Editar</button>' +
@@ -125,6 +127,7 @@ $(document).on("click", "#searchButton", function () {
 
       response["data"].forEach((element,i) => {
         const row = table.row.add(element).draw().node();
+        //console.log("row-" + i)
         $(row).attr("id", "row-" + i);
       });
     },
