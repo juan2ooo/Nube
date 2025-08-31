@@ -40,12 +40,12 @@ $(document).ready(function () {
       {
         data: null,
         title: "Acciones",
-        render: function (data, type, row) {
+      render: function(data, type, row) {
           return (
-            '<button class="btn-editar" data-id="' +
-            row.id +
-            '">Editar</button>' +
-            '<input type="checkbox" id="subscribeNews" name="subscribe" value="newsletter" />' 
+            '<div class="acciones-container">' +
+              '<button class="btn-editar" data-id="' + row.id + '">Editar</button>' +
+              '<input type="checkbox" id="subscribeNews" name="subscribe" value="newsletter" />' +
+            '</div>'
           );
         },
       },
@@ -105,8 +105,9 @@ $(document).on("click", "#searchButton", function () {
   const datosEnviar = { accion: "buscarClientes" };
   datosEnviar["telefono"] = $("#searchTerm1").val();
   datosEnviar["nombre"] = $("#searchTerm").val();
+  datosEnviar["all"] = false;
 
-  if (datosEnviar["nombre"] === "" && datosEnviar["telefono"] === "") return;
+  if (datosEnviar["nombre"] === "" && datosEnviar["telefono"] === "") datosEnviar["all"] = true;
 
   $.ajax({
     url: "../controlador/ControllerAdmin.php",
@@ -208,3 +209,60 @@ function vaciarClienteModal() {
   $("#telCliente").val("");
   $("#obsCliente").val("");
 }
+
+
+
+function eliminarElemento() {
+  const telefono = [];
+  
+  $("#resultsTable tr").each(function() {
+    const ultimoElemento = $(this).find("th,td").last().find("input[type='checkbox']");
+    
+    if (ultimoElemento.prop('checked')) {
+      console.log("El checkbox está marcado - acción de eliminar aquí");
+
+      // Obtener el texto del segundo elemento de la fila
+      telefono.push($(this).find("th,td").eq(1).text().trim());
+
+      // Eliminar la fila visualmente
+      $(this).remove();
+    }
+  });
+
+  console.log("Teléfonos a enviar:", telefono);
+
+  // === AJAX request ===
+  $.ajax({
+    url: "../controlador/ControllerAdmin.php", // aquí pones la ruta de tu archivo PHP
+    type: "POST",
+    data: {
+      accion: "desabilitarCliente",   // para que en PHP sepas qué función ejecutar
+      telefonos: telefono            // array de teléfonos
+    },
+    success: function(response) {
+      console.log("Respuesta del servidor:", response);
+      alert("Clientes deshabilitados correctamente");
+    },
+    error: function(xhr, status, error) {
+      console.error("Error en la solicitud AJAX:", error);
+    }
+  });
+}
+
+
+
+/* function eliminarElemento() {
+  $("#resultsTable tr").each(function() {
+    const ultimoElemento = $(this).find("th, td").last().find("input[type='checkbox']");
+    
+    if (ultimoElemento.length > 0) {
+      console.log("Checkbox encontrado. ¿Está marcado?", ultimoElemento.prop('checked'));
+      console.log("ljkn"); // Este mensaje se mantiene como en tu versión original
+      
+      if (ultimoElemento.prop('checked')) {
+        console.log("El checkbox está marcado - acción de eliminar aquí");
+        // Tu lógica para eliminar el elemento cuando está marcado
+      }
+    }
+  });
+} */

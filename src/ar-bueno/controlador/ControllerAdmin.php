@@ -56,9 +56,24 @@ if ($_POST['accion'] === 'buscarClientes' && $_SERVER['REQUEST_METHOD'] === 'POS
     ];
 
     try {
+
+
+        
         $nombre = $_POST["nombre"];
         $telefono = $_POST["telefono"];
         $admin = new Administrador();
+
+
+        if($_POST['all']){
+
+
+            $response["data"] = $admin->buscarTodo();
+            error_log("Respuesta all: " . print_r($response, true));
+            //header('Content-Type: application/json');
+            header('Content-Type: application/json');
+            echo json_encode($response);
+            exit;
+        }
 
         if (!empty($nombre) && !empty($telefono)) {
             $nombreClaves = ["nombre", "telefono"];
@@ -115,4 +130,32 @@ if ($_POST['accion'] === 'buscarClientes' && $_SERVER['REQUEST_METHOD'] === 'POS
     header('Content-Type: application/json');
     echo json_encode($response);
     exit;
+}
+
+
+
+
+
+if ($_POST['accion'] === 'desabilitarCliente' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $response = [
+        'success' => false,
+        'message' => '',
+        'data' => null
+    ];
+
+    try {
+
+
+        
+        $telefonos = $_POST["telefonos"];
+        //$telefono = $_POST["telefono"];
+        $admin = new Administrador();
+        
+        $response["data"] = $admin->desabilitarCliete($telefonos);
+        echo json_encode($response);
+
+
+    }catch(Exception $e){
+            $response['message'] = $e->getMessage();
+        }
 }

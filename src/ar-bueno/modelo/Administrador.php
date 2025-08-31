@@ -28,8 +28,7 @@ require_once "BD.php";
                 error_log("por el si");
                 
                 if (count($datos["claves"]) == 0){
-                    error_log("por el si x 2");
-                    error_log("por aqui!!!!");
+
                     return;
                 }
                 return $bd->selectByTwoKey($nombreTabla, $nombresClaves,$claves);
@@ -37,5 +36,19 @@ require_once "BD.php";
 
             error_log("por el no");
             return $bd->selectByKeyLike($nombreTabla, $nombresClaves,$claves);
+        }
+
+
+        public function buscarTodo(){
+            $bd = new BD();
+            return $bd->selectAll("cliente");
+        }
+
+
+        public function desabilitarCliete($telefonos){
+            $bd = new BD();
+            //$telefonos = ["3113311054"];
+            return $bd->desabilitarCliente("cliente","deleted",$telefonos);
+
         }
     }
