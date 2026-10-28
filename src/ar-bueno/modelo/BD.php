@@ -3,11 +3,14 @@
 class BD
 {
     // Atributos
-    private static $db_host = 'localhost';
-    private static $db_user = 'root';
+    //private static $db_host = 'localhost';
+    private static $db_host = '185.212.70.103';
+    //private static $db_user = 'root';
+    private static $db_user = 'u862140724_root';
     private static $db_pass = '';
     // private static $db_name = 'mexflix';
-    public $db_name = "bd_inmobiliaria";
+    //public $db_name = "bd_inmobiliaria";
+    public $db_name = "u862140724_inmobiliaria";
     private static $db_charset = 'utf8';
     private $conn;
     protected $query;
@@ -31,13 +34,16 @@ class BD
 
 
 
-    // Método seguro para insertar (versión simple)
-    public function insert($table, $data)
-    {
+public function insert($table, $data)
+{
+    // Hacer que mysqli lance excepciones en lugar de warnings
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+    try {
         // Leer contraseña desde archivo externo (ruta parametrizable)
         $file = '../auth/cr/entrar.txt'; // Cambia esta ruta
         self::$db_pass = file_get_contents($file);
-        
+
         $this->db_open();
 
         // 1. Preparar la consulta SQL con ?
@@ -49,11 +55,16 @@ class BD
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(str_repeat('s', count($data)), ...array_values($data));
         $stmt->execute();
-        
-        $stmt->close();
 
+        $stmt->close();
         $this->db_close();
+
+    } catch (mysqli_sql_exception $e) {
+        // Registrar el error en el log de PHP
+        error_log("Error en insert(): " . $e->getMessage());
     }
+}
+
 
 
     /**
@@ -75,7 +86,7 @@ class BD
 
         try {
             // 1. Preparar la consulta SQL con parámetro
-            $sql = "SELECT * FROM $nombreTabla WHERE deleted = 0 AND $nombreColumnaClave = ?";
+            $sql = "SELECT * FROM $nombreTabla WHERE  $nombreColumnaClave = ?";
             
             // 2. Crear y ejecutar el prepared statement
             $stmt = $this->conn->prepare($sql);
@@ -291,6 +302,64 @@ public function desabilitarCliente($table, $nombreColumna, $telefonos)
     }
 }
  
+
+
+
+
+
+
+
+public function actualizarRegistro($table, $nombreClave, $clave, $datos)
+{
+    // Log de los parámetros
+    error_log("Tabla: $table");
+    error_log("Nombre de clave: $nombreClave");
+    error_log("Valor de clave: $clave");
+    error_log("Datos a actualizar: " . print_r($datos, true));
+
+    // Leer contraseña desde archivo externo
+    $file = '../auth/cr/entrar.txt';
+    self::$db_pass = trim(file_get_contents($file));
+
+    // Abrir conexión si no está abierta
+    $this->db_open();
+
+    // Construir dinámicamente SET y valores
+    $setPart = [];
+    $valores = [];
+    foreach ($datos as $columna => $valor) {
+        $setPart[] = "`$columna` = ?";
+        $valores[] = $valor;
+    }
+
+    // Agregar la clave del WHERE
+    $valores[] = $clave;
+
+    // Construir SQL
+    $sql = "UPDATE `$table` SET " . implode(", ", $setPart) . " WHERE `$nombreClave` = ? AND deleted = 0";
+
+    // Preparar y ejecutar
+    $stmt = $this->conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error en preparar statement: " . $this->conn->error);
+        return false;
+    }
+
+    // Construir tipos para bind_param
+    $tipos = str_repeat("s", count($valores)); // asumimos todos strings
+    $stmt->bind_param($tipos, ...$valores);
+
+    if ($stmt->execute()) {
+        error_log("Registro actualizado correctamente.");
+        $stmt->close();
+        return true;
+    } else {
+        error_log("Error al actualizar registro: " . $stmt->error);
+        $stmt->close();
+        return false;
+    }
+}
+
 
 
 

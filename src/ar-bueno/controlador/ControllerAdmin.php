@@ -145,13 +145,63 @@ if ($_POST['accion'] === 'desabilitarCliente' && $_SERVER['REQUEST_METHOD'] === 
 
     try {
 
-
-        
         $telefonos = $_POST["telefonos"];
         //$telefono = $_POST["telefono"];
         $admin = new Administrador();
         
         $response["data"] = $admin->desabilitarCliete($telefonos);
+        echo json_encode($response);
+
+
+    }catch(Exception $e){
+            $response['message'] = $e->getMessage();
+        }
+}
+
+
+
+
+
+
+
+if ($_POST['accion'] === 'desabilitarCliente' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $response = [
+        'success' => false,
+        'message' => '',
+        'data' => null
+    ];
+
+    try {
+
+        $telefonos = $_POST["telefonos"];
+        //$telefono = $_POST["telefono"];
+        $admin = new Administrador();
+        
+        $response["data"] = $admin->desabilitarCliete($telefonos);
+        echo json_encode($response);
+
+
+    }catch(Exception $e){
+            $response['message'] = $e->getMessage();
+        }
+}
+
+
+
+if ($_POST['accion'] === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $response = [
+        'success' => false,
+        'message' => '',
+        'data' => null
+    ];
+
+    try {
+
+        $datosEditar = $_POST["datos"];
+        //$telefono = $_POST["telefono"];
+        $admin = new Administrador();
+        
+        $response["data"] = $admin->editar("cliente",$_POST['clave'],$_POST['valor'], $datosEditar);
         echo json_encode($response);
 
 

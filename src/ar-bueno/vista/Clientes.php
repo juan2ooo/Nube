@@ -23,6 +23,7 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Actualizar tiempo de actividad
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,13 +34,14 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Actualizar tiempo de actividad
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="../../lib/sweetalert2/dist/sweetalert2.min.js">
-    
+
     <link rel="stylesheet" href="Clientes.css">
 </head>
+
 <body>
     <div class="search-container">
         <h1><i class="fas fa-search"></i> Búsqueda de Clientes</h1>
-        
+
         <div class="search-box">
             <div class="search-input">
                 <input type="text" id="searchTerm" placeholder="Nombre">
@@ -60,28 +62,28 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Actualizar tiempo de actividad
 
 
         <!-- El modal -->
-<div id="myModal" class="modal">
-    <div class="modal-content">
-        <div class="firstRow">
-            <h2 class="modal-title">Formulario</h2>
-            <button class="save-btn save-btn-modificador" id="cerrar">X</button>
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <div class="firstRow">
+                    <h2 class="modal-title">Formulario</h2>
+                    <button class="save-btn save-btn-modificador" id="cerrar">X</button>
+                </div>
+
+
+                <input type="text" class="input-field" placeholder="Nombre" required id="nombreCliente">
+                <input type="tel" class="input-field" placeholder="Teléfono" required id="telCliente">
+                <select type="number" class="input-field" required id="horarioCliente">
+                    <option value="1">Mañana</option>
+                    <option value="2">Tarde</option>
+                    <option value="3">Noche</option>
+                </select>
+                <input type="text" class="input-field" placeholder="Observación" id="obsCliente">
+
+                <button class="save-btn" id="saveClient">Guardar</button>
+
+            </div>
         </div>
-        
 
-            <input type="text" class="input-field" placeholder="Nombre" required id="nombreCliente">
-            <input type="tel" class="input-field" placeholder="Teléfono" required id="telCliente">
-            <select type="number" class="input-field" required id="horarioCliente">
-                <option value="1">Mañana</option>
-                <option value="2">Tarde</option>
-                <option value="3">Noche</option>
-            </select>
-            <input type="text" class="input-field" placeholder="Observación" id="obsCliente">
-            
-            <button class="save-btn" id="saveClient">Guardar</button>
-
-    </div>
-</div>
-        
         <div class="results-container">
             <table id="resultsTable" class="display" style="width:100%">
                 <thead>
@@ -100,8 +102,45 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Actualizar tiempo de actividad
         </div>
     </div>
 
+
+
+<!-- Modal -->
+<div id="miModal">
+    <div class="modal-contenido">
+
+        <div class="contenedorTop">
+            <h3>Datos</h3>
+            <button style="width:25px; height:25px; display:flex; align-items:center; justify-content:center; padding:0;" onclick="cerrarModal()">X</button>
+        </div>
+
+        <label>Nombre:</label>
+        <input type="text" id="nombre" style="width:100%;"><br><br>
+
+        <label>Teléfono:</label>
+        <input type="text" id="telefono" style="width:100%;"><br><br>
+
+        <label>Horario:</label>
+        <select id="horario" style="width:100%;">
+            <option value="Mañana">Mañana</option>
+            <option value="Tarde">Tarde</option>
+            <option value="Noche">Noche</option>
+        </select><br><br>
+
+        <label>Observación:</label>
+        <textarea id="observacion" style="width:100%;"></textarea><br><br>
+
+        <button onclick="editar()">Editar</button>
+    </div>
+</div>
+
+
+
+
+
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="Clientes.js"></script>
 </body>
+
 </html>
