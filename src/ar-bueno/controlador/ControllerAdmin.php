@@ -208,6 +208,7 @@ if ($_POST['accion'] === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }catch(Exception $e){
             $response['message'] = $e->getMessage();
         }
+<<<<<<< HEAD
 }
 
 
@@ -234,3 +235,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['video'])) {
     exit;
 }
 
+=======
+}
+>>>>>>> 52e29957424d3b758662264d2027ca7dd8df62a5

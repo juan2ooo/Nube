@@ -4,6 +4,7 @@ class BD
 {
     // Atributos
     //private static $db_host = 'localhost';
+<<<<<<< HEAD
     private static $db_host = 'dbinmobiliaria.ckmhm1qm7yyy.us-east-1.rds.amazonaws.com';
     //private static $db_user = 'root';
     private static $db_user = 'admin';
@@ -11,6 +12,15 @@ class BD
     // private static $db_name = 'mexflix';
     //public $db_name = "bd_inmobiliaria";
     public $db_name = "inmobiliaria";
+=======
+    private static $db_host = '185.212.70.103';
+    //private static $db_user = 'root';
+    private static $db_user = 'u862140724_root';
+    private static $db_pass = '';
+    // private static $db_name = 'mexflix';
+    //public $db_name = "bd_inmobiliaria";
+    public $db_name = "u862140724_inmobiliaria";
+>>>>>>> 52e29957424d3b758662264d2027ca7dd8df62a5
     private static $db_charset = 'utf8';
     private $conn;
     protected $query;
@@ -34,6 +44,7 @@ class BD
 
 
 
+<<<<<<< HEAD
 
 
 /**
@@ -70,6 +81,8 @@ class BD
 
 
 
+=======
+>>>>>>> 52e29957424d3b758662264d2027ca7dd8df62a5
 public function insert($table, $data)
 {
     // Hacer que mysqli lance excepciones en lugar de warnings
@@ -384,6 +397,64 @@ public function desabilitarCliente($table, $nombreColumna, $telefonos)
  *     echo "No se pudo actualizar el registro.";
  * }
  */
+
+
+public function actualizarRegistro($table, $nombreClave, $clave, $datos)
+{
+    // Log de los parámetros
+    error_log("Tabla: $table");
+    error_log("Nombre de clave: $nombreClave");
+    error_log("Valor de clave: $clave");
+    error_log("Datos a actualizar: " . print_r($datos, true));
+
+    // Leer contraseña desde archivo externo
+    $file = '../auth/cr/entrar.txt';
+    self::$db_pass = trim(file_get_contents($file));
+
+    // Abrir conexión si no está abierta
+    $this->db_open();
+
+    // Construir dinámicamente SET y valores
+    $setPart = [];
+    $valores = [];
+    foreach ($datos as $columna => $valor) {
+        $setPart[] = "`$columna` = ?";
+        $valores[] = $valor;
+    }
+
+    // Agregar la clave del WHERE
+    $valores[] = $clave;
+
+    // Construir SQL
+    $sql = "UPDATE `$table` SET " . implode(", ", $setPart) . " WHERE `$nombreClave` = ? AND deleted = 0";
+
+    // Preparar y ejecutar
+    $stmt = $this->conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error en preparar statement: " . $this->conn->error);
+        return false;
+    }
+
+    // Construir tipos para bind_param
+    $tipos = str_repeat("s", count($valores)); // asumimos todos strings
+    $stmt->bind_param($tipos, ...$valores);
+
+    if ($stmt->execute()) {
+        error_log("Registro actualizado correctamente.");
+        $stmt->close();
+        return true;
+    } else {
+        error_log("Error al actualizar registro: " . $stmt->error);
+        $stmt->close();
+        return false;
+    }
+}
+
+
+
+
+
+
 
 
 public function actualizarRegistro($table, $nombreClave, $clave, $datos)
