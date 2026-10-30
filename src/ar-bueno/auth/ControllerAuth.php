@@ -30,33 +30,42 @@ class ControllerAuth
      * @param string $contrasena Contraseña ingresada
      * @return bool Retorna true si la contraseña es correcta, false en caso contrario
      */
-    public function verificarCredenciales($usuario, $contrasena)
-    {
+public function verificarCredenciales($usuario, $contrasena)
+{
+    try {
         $tabla = "administrador";
         $columnaClave = "usuario";
 
         $bd = new BD();
         $datos = $bd->selectByKey($tabla, $columnaClave, $usuario);
 
-        // Depurar el resultado de la consulta
-        //error_log("Resultado SELECT: " . print_r($datos, true));
-
         if (isset($datos[0]['contrasena'])) {
             $hash = $datos[0]['contrasena'];
 
-            //error_log("Contraseña ingresada: " . $contrasena);
-            //error_log("Hash almacenado: " . $hash);
-
             $respuesta = password_verify($contrasena, $hash);
 
-            //error_log("Resultado verificación: " . var_export($respuesta, true));
-            return $respuesta;
+            return [
+                "success" => $respuesta,
+                "message" => $respuesta ? "Credenciales válidas" : "Contraseña incorrecta"
+            ];
         }
 
-        // Si no se encontró el usuario o no hay campo de contraseña
-        //error_log("Usuario no encontrado o contraseña no definida.");
-        return false;
+        // Usuario no encontrado
+        return [
+            "success" => false,
+            "message" => "Usuario no encontrado"
+        ];
+
+    } catch (Exception $e) {
+        // Retornar el error al frontend en formato JSON
+        return [
+            "success" => false,
+            "error"   => true,
+            "message" => "Error en el servidor: " . $e->getMessage()
+        ];
     }
+}
+
 }
 
 // Manejo de la solicitud AJAX

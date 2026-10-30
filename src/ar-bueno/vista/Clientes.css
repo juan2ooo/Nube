@@ -192,3 +192,97 @@ h1 i {
 .save-btn-modificador{
     width: 10%;
 }
+
+
+
+
+
+
+
+
+
+
+
+/* Fondo del modal solo para #miModal */
+#miModal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+
+    
+    justify-content: center;
+    align-items: center;
+}
+
+/* Contenido del modal */
+#miModal .modal-contenido {
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 12px;
+    width: 350px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-family: Arial, sans-serif;
+}
+
+/* Título */
+#miModal .modal-contenido h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+}
+
+/* Etiquetas */
+#miModal .modal-contenido label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #444;
+}
+
+/* Inputs y textarea */
+#miModal .modal-contenido input,
+#miModal .modal-contenido textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Botón */
+#miModal .modal-contenido button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px;
+    background: #007bff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+#miModal .modal-contenido button:hover {
+    background: #0056b3;
+}
+
+
+.contenedorTop{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+}

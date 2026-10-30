@@ -3,11 +3,14 @@
 class BD
 {
     // Atributos
-    private static $db_host = 'localhost';
-    private static $db_user = 'root';
-    private static $db_pass = '';
+    //private static $db_host = 'localhost';
+    private static $db_host = 'dbinmobiliaria.ckmhm1qm7yyy.us-east-1.rds.amazonaws.com';
+    //private static $db_user = 'root';
+    private static $db_user = 'admin';
+    private static $db_pass = 'Naccional10.';
     // private static $db_name = 'mexflix';
-    public $db_name = "bd_inmobiliaria";
+    //public $db_name = "bd_inmobiliaria";
+    public $db_name = "inmobiliaria";
     private static $db_charset = 'utf8';
     private $conn;
     protected $query;
@@ -31,13 +34,52 @@ class BD
 
 
 
-    // Método seguro para insertar (versión simple)
-    public function insert($table, $data)
-    {
+
+
+/**
+ * Inserta un nuevo registro en una tabla de la base de datos.
+ *
+ * Este método construye dinámicamente una sentencia SQL `INSERT` usando 
+ * parámetros preparados (`prepared statements`) para evitar inyección SQL.
+ * Los valores son enlazados automáticamente como cadenas (`string`).
+ *
+ * Requisitos:
+ * - La clase debe tener implementados los métodos `db_open()` y `db_close()`.
+ * - La conexión debe estar definida en la propiedad `$this->conn` como instancia de `mysqli`.
+ * - El archivo `../auth/cr/entrar.txt` debe contener la contraseña de la base de datos.
+ *
+ * @param string $table  Nombre de la tabla en la cual se insertará el registro.
+ * @param array  $data   Arreglo asociativo con los campos y valores a insertar.
+ *                       Ejemplo: ['nombre' => 'Ana', 'edad' => 22]
+ *
+ * @return void  No retorna valor. Si ocurre un error, lo registra en el log de PHP.
+ *
+ * @throws mysqli_sql_exception Si ocurre un error al preparar o ejecutar la consulta.
+ *
+ * @example
+ * // Insertar un nuevo usuario en la tabla "usuarios"
+ * $obj->insert(
+ *     'usuarios',
+ *     [
+ *         'nombre' => 'Ana Gómez',
+ *         'correo' => 'ana@example.com',
+ *         'edad'   => 22
+ *     ]
+ * );
+ */
+
+
+
+public function insert($table, $data)
+{
+    // Hacer que mysqli lance excepciones en lugar de warnings
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+    try {
         // Leer contraseña desde archivo externo (ruta parametrizable)
         $file = '../auth/cr/entrar.txt'; // Cambia esta ruta
         self::$db_pass = file_get_contents($file);
-        
+
         $this->db_open();
 
         // 1. Preparar la consulta SQL con ?
@@ -49,11 +91,16 @@ class BD
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(str_repeat('s', count($data)), ...array_values($data));
         $stmt->execute();
-        
-        $stmt->close();
 
+        $stmt->close();
         $this->db_close();
+
+    } catch (mysqli_sql_exception $e) {
+        // Registrar el error en el log de PHP
+        error_log("Error en insert(): " . $e->getMessage());
     }
+}
+
 
 
     /**
@@ -75,7 +122,7 @@ class BD
 
         try {
             // 1. Preparar la consulta SQL con parámetro
-            $sql = "SELECT * FROM $nombreTabla WHERE deleted = 0 AND $nombreColumnaClave = ?";
+            $sql = "SELECT * FROM $nombreTabla WHERE  $nombreColumnaClave = ?";
             
             // 2. Crear y ejecutar el prepared statement
             $stmt = $this->conn->prepare($sql);
@@ -291,6 +338,105 @@ public function desabilitarCliente($table, $nombreColumna, $telefonos)
     }
 }
  
+
+
+
+
+
+/**
+ * Actualiza un registro en la base de datos.
+ *
+ * Construye y ejecuta de forma dinámica una sentencia SQL `UPDATE` en la tabla
+ * indicada, actualizando las columnas que se pasen en el arreglo de datos.
+ * Solo se actualizan registros que no estén marcados como eliminados (`deleted = 0`).
+ *
+ * Requisitos:
+ * - La clase debe tener un método `db_open()` que inicialice la conexión `$this->conn`.
+ * - La conexión debe ser una instancia de `mysqli`.
+ * - El archivo `../auth/cr/entrar.txt` debe contener la contraseña de la base de datos.
+ *
+ * @param string $table        Nombre de la tabla sobre la cual se realizará la actualización.
+ * @param string $nombreClave  Nombre de la columna que actúa como clave primaria o única.
+ * @param mixed  $clave        Valor de la clave para identificar el registro a actualizar.
+ * @param array  $datos        Arreglo asociativo con los campos y valores a actualizar.
+ *                             Ejemplo: ['nombre' => 'Juan', 'edad' => 25]
+ *
+ * @return bool  Devuelve `true` si la actualización se ejecutó correctamente,
+ *               o `false` si ocurrió un error en la preparación o ejecución.
+ *
+ * @throws RuntimeException Si no se puede preparar la sentencia SQL.
+ *
+ * @example
+ * // Ejemplo de uso:
+ * $exito = $obj->actualizarRegistro(
+ *     'usuarios',          // Tabla
+ *     'id_usuario',        // Columna clave
+ *     15,                  // Valor de clave
+ *     [                    // Campos a actualizar
+ *         'nombre' => 'Carlos Pérez',
+ *         'correo' => 'carlos@example.com'
+ *     ]
+ * );
+ *
+ * if ($exito) {
+ *     echo "Registro actualizado correctamente.";
+ * } else {
+ *     echo "No se pudo actualizar el registro.";
+ * }
+ */
+
+
+public function actualizarRegistro($table, $nombreClave, $clave, $datos)
+{
+    // Log de los parámetros
+    error_log("Tabla: $table");
+    error_log("Nombre de clave: $nombreClave");
+    error_log("Valor de clave: $clave");
+    error_log("Datos a actualizar: " . print_r($datos, true));
+
+    // Leer contraseña desde archivo externo
+    $file = '../auth/cr/entrar.txt';
+    self::$db_pass = trim(file_get_contents($file));
+
+    // Abrir conexión si no está abierta
+    $this->db_open();
+
+    // Construir dinámicamente SET y valores
+    $setPart = [];
+    $valores = [];
+    foreach ($datos as $columna => $valor) {
+        $setPart[] = "`$columna` = ?";
+        $valores[] = $valor;
+    }
+
+    // Agregar la clave del WHERE
+    $valores[] = $clave;
+
+    // Construir SQL
+    $sql = "UPDATE `$table` SET " . implode(", ", $setPart) . " WHERE `$nombreClave` = ? AND deleted = 0";
+
+    // Preparar y ejecutar
+    $stmt = $this->conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error en preparar statement: " . $this->conn->error);
+        return false;
+    }
+
+    // Construir tipos para bind_param
+    $tipos = str_repeat("s", count($valores)); // asumimos todos strings
+    $stmt->bind_param($tipos, ...$valores);
+
+    if ($stmt->execute()) {
+        error_log("Registro actualizado correctamente.");
+        $stmt->close();
+        return true;
+    } else {
+        error_log("Error al actualizar registro: " . $stmt->error);
+        $stmt->close();
+        return false;
+    }
+}
+
 
 
 

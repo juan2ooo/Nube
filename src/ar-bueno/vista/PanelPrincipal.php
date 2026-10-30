@@ -41,7 +41,7 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Actualizar tiempo de actividad
       <i class="fas fa-users"></i>
       <span>Clientes</span>
     </a>
-    <a href="#propiedades" class="boton">
+    <a href="Propiedades.php" class="boton">
       <i class="fas fa-building"></i>
       <span>Propiedades</span>
     </a>

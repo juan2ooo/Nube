@@ -145,8 +145,6 @@ if ($_POST['accion'] === 'desabilitarCliente' && $_SERVER['REQUEST_METHOD'] === 
 
     try {
 
-
-        
         $telefonos = $_POST["telefonos"];
         //$telefono = $_POST["telefono"];
         $admin = new Administrador();
@@ -159,3 +157,80 @@ if ($_POST['accion'] === 'desabilitarCliente' && $_SERVER['REQUEST_METHOD'] === 
             $response['message'] = $e->getMessage();
         }
 }
+
+
+
+
+
+
+
+if ($_POST['accion'] === 'desabilitarCliente' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $response = [
+        'success' => false,
+        'message' => '',
+        'data' => null
+    ];
+
+    try {
+
+        $telefonos = $_POST["telefonos"];
+        //$telefono = $_POST["telefono"];
+        $admin = new Administrador();
+        
+        $response["data"] = $admin->desabilitarCliete($telefonos);
+        echo json_encode($response);
+
+
+    }catch(Exception $e){
+            $response['message'] = $e->getMessage();
+        }
+}
+
+
+
+if ($_POST['accion'] === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $response = [
+        'success' => false,
+        'message' => '',
+        'data' => null
+    ];
+
+    try {
+
+        $datosEditar = $_POST["datos"];
+        //$telefono = $_POST["telefono"];
+        $admin = new Administrador();
+        
+        $response["data"] = $admin->editar("cliente",$_POST['clave'],$_POST['valor'], $datosEditar);
+        echo json_encode($response);
+
+
+    }catch(Exception $e){
+            $response['message'] = $e->getMessage();
+        }
+}
+
+
+
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['video'])) {
+    $admin = new Administrador();
+
+    try {
+        $url = $admin->subirVideoAGoogleDrive($_FILES['video']);
+
+        echo json_encode([
+            "success" => true,
+            "url" => $url
+        ]);
+    } catch (Exception $e) {
+        echo json_encode([
+            "success" => false,
+            "message" => $e->getMessage()
+        ]);
+    }
+    exit;
+}
+
