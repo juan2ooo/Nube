@@ -1,6 +1,5 @@
 <?php
 require_once "BD.php";
-<<<<<<< HEAD
 //require __DIR__ . '/vendor/autoload.php';
 
 //require '../../../vendor/autoload.php';
@@ -24,13 +23,6 @@ class Administrador
     // ID fijo de la carpeta en Google Drive
     //private $folderId = "17R1z9C4zFBiT13Sb8kvDoBmmufTGd9RL";
 
-=======
-class Administrador
-{
-    public $nombre;
-    public $usuario;
-
->>>>>>> 52e29957424d3b758662264d2027ca7dd8df62a5
     public function crearCliente(Cliente $cliente)
     {
         $datosCliente = array(
@@ -105,7 +97,6 @@ class Administrador
 
             // Retornar false o un mensaje de error
             return false;
-<<<<<<< HEAD
         }
     }
 
@@ -216,9 +207,5 @@ public function subirVideoAGoogleDrive($file)
 
 
 
-=======
-        }
-    }
->>>>>>> 52e29957424d3b758662264d2027ca7dd8df62a5
     
 }
